@@ -4,23 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>calc</title>
-    <script src="https://unpkg.com/jquery@1.12.4/dist/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
     <style>
+    html,
+    body {
+        height: 100%;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+    }
     body {
         overflow: hidden;
+    }
+
+    input {
+        font-family: 'Orbitron', sans-serif;
     }
 
     input[type=submit],
     input[type=button] {
         border: 0;
         background: transparent;
+        cursor: pointer;
+        height: 100%;
     }
 
     form {
-        min-width: 280px;
+        min-width: 320px;
         width: 50%;
-        margin: 0 auto;
+        max-width: 480px;
+        margin: 5% auto 0;
         box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
     }
 
@@ -28,6 +41,20 @@
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
+        border: 2px solid #000;
+    }
+
+    @media (max-width: 600px) {
+        form {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            box-shadow: none;
+        }
+
+        table {
+            height: 100%;
+        }
     }
 
     table th {
@@ -35,110 +62,141 @@
         border: 2px solid #000;
     }
 
-    table tr:last-child td,
-    table tr:nth-child(n+2) td:last-child {
+    .ctrl input {
         background: orange;
+    }
+
+    .ctrl:hover input {
+        background: rgb(255, 197, 156);
+    }
+
+    .num input {
+        background: #eee;
+    }
+
+    .num:hover input {
+        background: #fff !important;
     }
 
     table th input {
         border: 0;
         background: transparent;
         color: #fff;
-        font-size: 24px;
+        font-size: 30px;
         text-align: right;
         width: 100%;
-        padding: 10px;
+        padding: 20px;
         box-sizing: border-box;
     }
 
-    table td {
-        background: #eee;
+    table tbody td {
+        background: #000;
         text-align: center;
         vertical-align: middle;
-        border: 2px solid #000;
+        height: 70px;
     }
 
-    table td input {
+    table tbody td input {
         font-size: 24px;
-        height: 50px;
         width: 100%;
+        background: #eee;
+    }
+
+    input[type=button]:active,
+    .active input {
+        animation: pop 150ms ease-out 1;
+    }
+
+    @keyframes pop {
+        40% {
+            transform: scale(0.9);
+        }
     }
     </style>
 </head>
 <body>
     <form name="cal">
         <table>
-            <tr>
-                <th colspan="4">
-                    <input type="text" name="result" value="0">
-                </th>
-            </tr>
-            <tr>
-                <td>    <input type="button" value="7"></td>
-                <td>    <input type="button" value="8"></td>
-                <td>    <input type="button" value="9"></td>
-                <td>    <input type="button" value="+"></td>
-            </tr>
-            <tr>
-                <td>    <input type="button" value="4"></td>
-                <td>    <input type="button" value="5"></td>
-                <td>    <input type="button" value="6"></td>
-                <td>    <input type="button" value="-"></td>
-            </tr>
-            <tr>
-                <td> <input type="button" value="1"> </td>
-                <td>    <input type="button" value="2"></td>
-                <td>    <input type="button" value="3"></td>
-                <td>    <input type="button" value="*"></td>
-            </tr>
-            <tr>
-                <td colspan="2">    <input type="button" value="0"></td>
-                <td>    <input type="button" value="%"></td>
-                <td>    <input type="button" value="/"></td>
-            </tr>
-            <tr>
-                <td colspan="1">    <input class="cls_btn" type="button" value="clear"></td>
-                <td colspan="3">    <input class="result_btn" type="submit" value="="></td>
-            </tr>
+            <thead>
+                <tr>
+                    <th colspan="4">
+                        <input readonly type="text" name="result" value="0">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num"><input type="button" value="7"></td>
+                    <td class="num"><input type="button" value="8"></td>
+                    <td class="num"><input type="button" value="9"></td>
+                    <td class="ctrl"><input type="button" value="+"></td>
+                </tr>
+                <tr>
+                    <td class="num"><input type="button" value="4"></td>
+                    <td class="num"><input type="button" value="5"></td>
+                    <td class="num"><input type="button" value="6"></td>
+                    <td class="ctrl"><input type="button" value="-"></td>
+                </tr>
+                <tr>
+                    <td class="num"><input type="button" value="1"></td>
+                    <td class="num"><input type="button" value="2"></td>
+                    <td class="num"><input type="button" value="3"></td>
+                    <td class="ctrl"><input type="button" value="*"></td>
+                </tr>
+                <tr>
+                    <td class="num" colspan="2">    <input type="button" value="0"></td>
+                    <td class="ctrl"><input type="button" value="%"></td>
+                    <td class="ctrl"><input type="button" value="/"></td>
+                </tr>
+                <tr>
+                    <td class="ctrl" colspan="1">    <input class="cls_btn" type="button" value="clear"></td>
+                    <td class="ctrl" colspan="3">    <input class="result_btn" type="submit" value="="></td>
+                </tr>
+            </tbody>
         </table>
     </form>
 <script>
 var inp = document.forms['cal'];
+var result = inp['result'];
 var input = inp.getElementsByTagName('input');
 var cls_btn = document.getElementsByClassName('cls_btn')[0];
 var result_btn = document.getElementsByClassName('result_btn')[0];
 
 // 계산기 초기화 (clear);
 function clr() {
-    inp['result'].value = 0;
+    result.value = 0;
 }
 
 // 계산기 입력 처리 함수
 function calc(value) {
     // 입력이 들어가면 0을 지움
-    if (inp['result'].value == 0) {
-        inp['result'].value = '';
+    if (result.value == 0) {
+        result.value = '';
     }
 
     // 입력 값을 결과창에 출력
-    inp['result'].value += value;
+    result.value += value;
+}
+
+// 하나 지우기
+function backspace() {
+
 }
 
 // 계산 결과 처리 함수
 function my_result() {
-    var result = document.forms['cal']['result'];
     var calc = eval(result.value);
+    calc = calc || 0;
 
     // 결과창에 표시
-    inp['result'].value = calc;
+    result.value = calc;
 }
 
-function result() {
+function sumresult() {
     try {
         my_result();
     }
     catch (err) {
-        var result = inp['result'];
         result.value = '입력 오류';
     }
 }
@@ -148,7 +206,7 @@ function result() {
 for (var i = 0; i < input.length; i++) {
     // 숫자와 사칙 연산자만 입력 처리
     if (input[i].value != '=' && input[i].value != 'clear' && input[i].name !== 'result') {
-        input[i].onclick = function () {
+        input[i].onmouseup = function (e) {
             calc(this.value);
         }
     }
@@ -161,13 +219,64 @@ cls_btn.onclick = function () {
 
 inp.onsubmit = function (e) {
     e.preventDefault();
-    result();
+    sumresult();
 }
 
 // 결과 버튼
 result_btn.onclick = my_result;
 
+document.body.addEventListener('keyup', function (e) {
+    var v = '';
+    // console.log('code: ' + e.code + ', ' + 'keyCode: ' + e.keyCode);
+    // +
+    if (e.keyCode == 187) {
+        v = '+';
+    // -
+    } else if (e.keyCode == 189) {
+        v = '-';
+    // *
+    } else if (e.keyCode == 56 && e.shiftKey == true) {
+        v = '*';
+    // /
+    } else if (e.keyCode == 191) {
+        v = '/';
+    // %
+    } else if (e.keyCode == 53 && e.shiftKey == true) {
+        v = '%';
+    // 숫자 키보드 대응
+    } else if (e.keyCode >= 48 && e.keyCode <= 57) {
+       v = e.code.replace('Digit', '');
+    }
 
+    if (v) {
+        var td = document.querySelector('table tbody input[value="' + v + '"]').parentNode;
+        td.classList.add('active');
+        setTimeout(function () {
+            td.classList.remove('active');
+        }, 150);
+        calc(v);
+    }
+
+    // clear (esc)
+    if (e.keyCode == 27) {
+        if (result.value != 0 && confirm('계산기를 초기화 시키겠습니까?')) {
+            clr();
+        }
+    }
+    // sum (shift + enter)
+    if (e.keyCode == 13) {
+        inp.onsubmit(e);
+    }
+    // backspace
+    if (e.keyCode == 8) {
+        var origin = result.value.slice(0, -1);
+        if (!origin) {
+            result.value = 0;
+        } else {
+            result.value = origin;
+        }
+    }
+});
 </script>
 </body>
 </html>
